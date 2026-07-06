@@ -1,4 +1,5 @@
-# Telegram Bot Keyboards
+#!/usr/bin/env python3
+# Telegram Bot Keyboard
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 
