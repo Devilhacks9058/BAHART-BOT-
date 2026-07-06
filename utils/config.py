@@ -13,9 +13,9 @@ POCKET_OPTION_UID = os.getenv('POCKET_OPTION_UID', '81704775')
 POCKET_OPTION_WS_URL = 'wss://api.poc-app.com/socket.io'
 
 # Trading Configuration
-MIN_ACCURACY_THRESHOLD = 0.90  # 90% minimum accuracy
-TIMEFRAME = '1m'  # 1-minute candles
-EXPIRY_TIME = 60  # 1 minute expiry
+MIN_ACCURACY_THRESHOLD = 0.90
+TIMEFRAME = '1m'
+EXPIRY_TIME = 60
 
 # Technical Indicators - 1-Minute Optimized Settings
 INDICATOR_SETTINGS = {
@@ -44,48 +44,24 @@ INDICATOR_SETTINGS = {
 # Signal Generation Settings
 SIGNAL_SETTINGS = {
     'require_multi_confirmation': True,
-    'min_indicators_agree': 12,  # At least 12 indicators must agree
+    'min_indicators_agree': 12,
     'pattern_weight': 0.3,
     'indicator_weight': 0.7,
     'use_consensus_voting': True
 }
 
-# Trading Risk Management
+# Risk Management
 RISK_MANAGEMENT = {
-    'max_daily_loss': 0.10,  # 10% max daily loss
-    'max_position_size': 0.05,  # 5% per trade
+    'max_daily_loss': 0.10,
+    'max_position_size': 0.05,
     'stop_loss_pips': 50,
-    'take_profit_ratio': 2.0  # 1:2 risk-reward
+    'take_profit_ratio': 2.0
 }
 
-# Logging
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
 LOG_FILE = 'logs/bahart_bot.log'
 
-# Assets to Monitor
 ASSETS = [
-    'EURUSD',
-    'GBPUSD',
-    'USDJPY',
-    'USDCHF',
-    'AUDUSD',
-    'NZDUSD',
-    'USDCAD',
-    'XAUUSD',
-    'XAGUSD',
-    'US500',
-    'US100',
-    'OIL',
-    'BTCUSD',
-    'ETHUSD'
+    'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'NZDUSD', 'USDCAD',
+    'XAUUSD', 'XAGUSD', 'US500', 'US100', 'OIL', 'BTCUSD', 'ETHUSD'
 ]
-
-# API Rate Limits
-RATE_LIMITS = {
-    'candles_per_minute': 100,
-    'signals_per_minute': 10,
-    'trades_per_minute': 5
-}
-
-# Database Configuration (Optional)
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost:5432/bahart_bot')

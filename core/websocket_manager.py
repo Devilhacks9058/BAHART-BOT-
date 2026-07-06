@@ -1,23 +1,21 @@
 import asyncio
 import websocket
 import json
-from typing import Callable, Dict, Any
+from typing import Callable, Dict
 from utils.logger import setup_logger
-from utils.config import (
-    POCKET_OPTION_WS_URL,
-    POCKET_OPTION_SESSION_TOKEN,
-    POCKET_OPTION_UID
-)
 
 logger = setup_logger('WebSocketManager')
 
 class WebSocketManager:
     """Manage WebSocket connection to Pocket Option"""
     
-    def __init__(self):
+    def __init__(self, session_token: str, uid: str):
         self.ws = None
         self.is_connected = False
         self.message_callbacks: Dict[str, Callable] = {}
+        self.session_token = session_token
+        self.uid = uid
+        self.ws_url = 'wss://api.poc-app.com/socket.io'
         
     def register_callback(self, event: str, callback: Callable):
         """Register callback for specific event"""
@@ -28,16 +26,14 @@ class WebSocketManager:
         """Connect to Pocket Option WebSocket"""
         try:
             self.ws = websocket.WebSocketApp(
-                POCKET_OPTION_WS_URL,
+                self.ws_url,
                 on_open=self._on_open,
                 on_message=self._on_message,
                 on_error=self._on_error,
                 on_close=self._on_close
             )
-            
             self.ws.run_forever()
             logger.info("WebSocket connection established")
-            
         except Exception as e:
             logger.error(f"WebSocket connection error: {e}")
             self._reconnect()
@@ -50,8 +46,7 @@ class WebSocketManager:
     
     def _authenticate(self):
         """Authenticate with Pocket Option"""
-        auth_message = f'42["auth",{{"sessionToken":"{POCKET_OPTION_SESSION_TOKEN}","uid":"{POCKET_OPTION_UID}","lang":"en","currentUrl":"cabinet","isChart":1}}]'
-        
+        auth_message = f'42["auth",{{"sessionToken":"{self.session_token}","uid":"{self.uid}","lang":"en","currentUrl":"cabinet","isChart":1}}]'
         try:
             self.ws.send(auth_message)
             logger.info("Authentication message sent")
@@ -61,17 +56,13 @@ class WebSocketManager:
     def _on_message(self, ws, message: str):
         """Handle incoming WebSocket message"""
         try:
-            # Parse Socket.IO message format
             if message.startswith('42'):
                 data = json.loads(message[2:])
                 event = data[0] if data else None
                 payload = data[1] if len(data) > 1 else {}
-                
                 if event in self.message_callbacks:
                     self.message_callbacks[event](payload)
-                    
                 logger.debug(f"Received event: {event}")
-                
         except Exception as e:
             logger.error(f"Error processing message: {e}")
     
@@ -84,13 +75,6 @@ class WebSocketManager:
         """Handle WebSocket close"""
         logger.warning(f"WebSocket closed: {close_msg}")
         self.is_connected = False
-        self._reconnect()
-    
-    def _reconnect(self, delay: int = 5):
-        """Reconnect to WebSocket"""
-        logger.info(f"Attempting to reconnect in {delay} seconds...")
-        asyncio.sleep(delay)
-        self.connect()
     
     def send_message(self, event: str, data: Dict = None):
         """Send message through WebSocket"""
